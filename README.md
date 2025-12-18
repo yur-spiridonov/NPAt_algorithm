@@ -334,7 +334,10 @@ Below is a demonstration algorithm showing how to implement summation of arbitra
 The algorithm is implemented in C++ and available at — [npap-algorithm.cpp](npap-algorithm.cpp)
 ### Demo Presentation (PowerPoint)
 
-[Download NPAp Demo Presentation](presentation.pptx)
+## Demo Presentation
+
+[Download NPAt Demo Presentation](presentation.pptx)
+
 
 The program performs summation  
 **R = ±x₁ ± x₂·(Z−1)**.
