@@ -330,6 +330,8 @@ In the columns and rows of Table 1 for NPAt, the following cases are presented:
 12. The NPAt format allows very simple implementation of computations on CPU, yielding results identical to computations on FPU.
 
 Below is a demonstration algorithm showing how to implement summation of arbitrary input signed numbers **x₁** and **x₂** in NPAt format on an integer processor, with the same results as when summing the same numbers in float or double format.
+![Example Calculation](images/example.png)
+
 
 The algorithm is implemented in C++ and available at — [npap-algorithm.cpp](npap-algorithm.cpp)
 ### Demo Presentation (PowerPoint)
