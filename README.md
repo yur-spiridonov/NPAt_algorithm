@@ -1,6 +1,26 @@
-# NPAt_algorithm
-FPN calculations without normalization, with integer bitwise comparisons, with integers. Bitwise compatible with IEEE 754.
 # An Alternative Algorithm for Summing Any Decimal Numbers in Binary Arithmetic
+
+## Abstract
+
+We propose a new number format — **NPAt** — fully compatible with conventional finite arithmetic.  
+The NPAt format enables computations of decimal floating‑point numbers (represented in binary form) on an integer processor without an FPU.  
+Computation results in NPAt are **bit‑identical** to those obtained using the IEEE754 binary standard.
+
+NPAt defines two data types:  
+- Numbers, consisting of exact values, approximate values, and explicit zero.  
+- Non‑numbers (NaN).  
+
+The presence of explicit zero allows bitwise comparison across the entire floating‑point range.  
+NPAt forms a monotonically increasing sequence throughout the range from the minimum to the maximum possible values.  
+It also allows representation of positive and negative numbers whose magnitudes are smaller than the minimum representable value.  
+Such numbers can be considered infinitesimal, but not equal to zero.  
+
+Parameters representing signed NPAt numbers are integers or zero, so all computations can be performed in two’s complement code.  
+When summing numbers in NPAt format, normalization is not required.  
+The NPAt format has no concept of subnormal numbers, eliminating the need for special handling.  
+Finally, the precision parameter in NPAt does not affect the computation algorithm.
+
+## Theoretical Foundations of NPAt
 
 Any number **X** can be represented as an infinite integer **K** (0 ≤ K < ∞) of infinitesimal intervals **ɛ**.
 
@@ -330,11 +350,12 @@ In the columns and rows of Table 1 for NPAt, the following cases are presented:
 12. The NPAt format allows very simple implementation of computations on CPU, yielding results identical to computations on FPU.
 
 Below is a demonstration algorithm showing how to implement summation of arbitrary input signed numbers **x₁** and **x₂** in NPAt format on an integer processor, with the same results as when summing the same numbers in float or double format.
+
+
 ![Example Calculation](images/demo-04.png)
 
 
 The algorithm is implemented in C++ and available at — [npap-algorithm.cpp](npap-algorithm.cpp)
-### Demo Presentation (PowerPoint)
 
 ## Demo Presentation
 
