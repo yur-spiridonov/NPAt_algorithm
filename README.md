@@ -356,7 +356,7 @@ This is an example of one of the screenshots of computation results presented in
 ![Example Calculation](images/demo-04.png)
 
 
-The algorithm is implemented in C++ and available at — [npap-algorithm.cpp](npap-algorithm.cpp)
+The algorithm is implemented in C++ and available at — [npap-algorithm.cpp](NPAt_algorithm.cpp)
 
 ## Demo Presentation
 
