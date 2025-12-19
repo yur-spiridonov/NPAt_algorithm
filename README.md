@@ -351,6 +351,7 @@ In the columns and rows of Table 1 for NPAt, the following cases are presented:
 
 Below is a demonstration algorithm showing how to implement summation of arbitrary input signed numbers **x₁** and **x₂** in NPAt format on an integer processor, with the same results as when summing the same numbers in float or double format.
 
+This is an example of one of the screenshots of computation results presented in the PowerPoint below, obtained using the demonstration algorithm.
 
 ![Example Calculation](images/demo-04.png)
 
