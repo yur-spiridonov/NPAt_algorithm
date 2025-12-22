@@ -353,7 +353,8 @@ Below is a demonstration algorithm showing how to implement summation of arbitra
 
 This is an example of one of the screenshots of computation results presented in the PowerPoint below, obtained using the demonstration algorithm.
 
-![Example Calculation](images/demo-04.png)
+![Example Calculation](demo-04.png)
+
 
 
 The algorithm is implemented in C++ and available at — [NPAt-algorithm.cpp](NPAt_algorithm.cpp)
