@@ -360,7 +360,7 @@ The algorithm is implemented in C++ and available at — [NPAt-algorithm.cpp](NP
 
 ## Demo Presentation
 
-[Download NPAt Demo Presentation](presentation.pptx)
+[View NPAt Demo Presentation (PDF)](presentation.pdf)
 
 
 The program performs summation  
