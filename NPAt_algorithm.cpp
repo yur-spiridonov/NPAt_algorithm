@@ -1,30 +1,37 @@
 // Author: Iouri Spiridonov
 // NPAp — Number with Point After p
-// Полная, точная, бит-в-бит совместимость с IEEE 754 double/float
+//Full, accurate, bit-for-bit compatibility with IEEE 754 double/float
 // =============================================================================
 
 #include <iostream>
 #include <iomanip>
 #include <cmath>
 #include <cstdlib>
+#include <bitset>
 
 using namespace std;
 
-int main() {
+int main()
+{
     // ========================== INPUT ==========================
-    double x1 = -0.89382715639;
-    double x2 = 0.7878271567;
-    int Z = 1'000'000;
+    double x1 = 0.93827156398976e-38;
+    double x2 = 0.78782715676579e-38;
+    int Z = 1000000000;
+
+     std::cout << "  x1  = " << x1 << "\n";
+     std::cout << "  x2 = " << x2 << "\n";
+     std::cout << "  Z = " << Z << "\n";
+     std::cout << "  NPAt =  x1 + (x2 + x2 + ... + x2)"  << "\n";
 
     // ========================== CONFIG ==========================
     int Double_Float = 0;  // 0 = double (p=53), 1 = float (p=24)
     int p = (Double_Float == 0) ? 53 : 24;
 
-    long long K, K1, K2, X_max;
+    long long int K, K1, K2, X_max;
     int e1, e2, E, v1, v2;
     int S1 = 1, S2 = 1;
     int g = 0, q = 0, bit0 = 0, bit1 = 0, t = 0;
-
+    unsigned i;
     double buffer = 0.0;
     double Y1_Double = 0.0, Y2_Double = 0.0, R_Double = 0.0;
     float  Y1_Float = 0.0f, Y2_Float = 0.0f, R_Float = 0.0f;
@@ -60,7 +67,8 @@ int main() {
     v2 = e2 - p;
 
     // ========================== CONVERT TO INTEGER MANTISSA ==========================
-    if (Double_Float == 1) {
+    if (Double_Float == 1) 
+    {
         K1 = llround(fabs(x1) * pow(2.0, -v1 + 1));
         K2 = llround(fabs(x2) * pow(2.0, -v2 + 1));
 
@@ -79,17 +87,18 @@ int main() {
     }
 
     // ========================== EXPONENT ALIGNMENT ==========================
-    if (t != 0) {
+    if (t != 0) 
+    {
+        K = K2;
         K2 >>= (t - 1);
-        bit0 = (K2 >> 0) & 1;
+        g = (K2 >> 0) & 1;
+        if (K2 << (t - 1) != K)
+            q = 1;   
+    bit0 = (K2 >> 0) & 1;
         K2 >>= 1;
-
-        if (~(K2 << t) * x2 != 0) {
-            q = 1;
-        }
     }
 
-    if (bit0 == 1) {
+    if (g == 1&&bit0==1) {
         K2++;
     }
 
@@ -97,67 +106,88 @@ int main() {
     K = K1;
 
     // ========================== SUMMATION LOOP ==========================
-    cout << fixed << setprecision(35);
 
-    for (int i = 2; i <= Z; ++i) {
-
+    for ( i = 2; i <= Z; ++i)
+    {
+      
         K = S1 * K + S2 * K2;
         S1 = 1;
 
-        if (K < 0) {
+        if (K < 0) 
+        {
             S1 = -1;
             K = abs(K);
         }
 
-        if (abs(K) >= X_max) {
+         bit0 = (K >> 0) & 1;
+
+        if (abs(K) >= X_max)
+        {
             E++;
 
-            if (g == 1) q = 1;
-
-            bit0 = (K >> 0) & 1;
             bit1 = (K >> 1) & 1;
+            K = K >> 1;
 
-            if (bit1 == 1) {
-                if (bit0 == 1) K++;
-            }
-            else {
-                if ((bit0 | q) == 1) K++;
-            }
+            if (bit0 == 1)
+            {
+                if (bit0 == 1 && bit1 == 0 && g == 0 && q == 0)
+                    goto  ResearchK2;
 
-            g = 0;
+                if (bit0 == 1 && bit1 == 1)
+                {
+                    K++;
+                    goto  ResearchK2;
+                }
+
+                K++;
+            }
+        ResearchK2:
             bit0 = (K2 >> 0) & 1;
-            if (bit0 == 1) g = 1;
-
-            K >>= 1;
-            K2 >>= 1;
-
+            if (g == 1)
+                q = 1;
+            g = 0;
+            if (bit0 == 1)
+                g = 1;
+            K2 = K2 >> 1;
         }
-        else {
-            bit0 = (K >> 0) & 1;
-
-            if (bit0 == 1) {
-                K += g;
+        else
+        { 
+            if (g == 1)
+            {
+                if (bit0 == 1)
+                    K++;
+                  else
+                { 
+                    if (q == 1)
+                        K++;
+                }
             }
-            else if ((g + q) / 2 == 1) {
-                K += 1;
+}
+
+            if (Double_Float == 0)
+            {
+                R_Double = S1 * (K * pow(2.0, E));
             }
-        }
+            else
+            {
+                R_Float = S1 * (K * pow(2.0, E));
+                Y1_Float += Y2_Float;
+            }
+    
+             Y1_Double += Y2_Double;
 
-        if (Double_Float == 0) {
-            R_Double = S1 * (K * pow(2.0, E));
-            Y1_Double += Y2_Double;
-        }
-        else {
-            R_Float = S1 * (K * pow(2.0, E));
-            Y1_Float += Y2_Float;
-        }
+  
+             if (i >=  Z-10 )
+        
+            {
+           std::cout << "  ------------------------------ " << "\n";
+                std::cout  << "  i  = " << i << "\n";
+               std::cout << setprecision(55) << "  NPAt     =  " << R_Double << "\n";
+              std::cout << setprecision(55) << "  Y_double  = " << Y1_Double << "\n";
+     
+            }
 
-        if (i <= 10 || i % 100000 == 0 || i == Z) {
-            cout << "i=" << setw(7) << i
-                << " | NPAt=" << setw(45) << R_Double
-                << " | IEEE=" << setw(45) << Y1_Double
-                << "\n";
-        }
+
     }
 
     return 0;
