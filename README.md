@@ -361,7 +361,6 @@ The algorithm is implemented in C++ and available at — [NPAt-algorithm.cpp](NP
 
 ## Demo Presentation
 
-[View NPAt Demo Presentation (PDF)](presentation.pdf)
 
 
 The program performs summation  
