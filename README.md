@@ -357,7 +357,7 @@ This is an example of one of the screenshots of computation results presented in
 
 
 
-The algorithm is implemented in C++ and available at — [NPAt-algorithm.cpp](NPAt_algorithm.cpp)
+
 
 ## Demo Presentation
 
