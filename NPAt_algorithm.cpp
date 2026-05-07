@@ -1,194 +1,127 @@
-// Author: Iouri Spiridonov
-// NPAp — Number with Point After p
-//Full, accurate, bit-for-bit compatibility with IEEE 754 double/float
-// =============================================================================
-
 #include <iostream>
 #include <iomanip>
+#include <cstring>
 #include <cmath>
-#include <cstdlib>
-#include <bitset>
+#include <intrin.h>
+#include <cstdint>
+#include <algorithm>
+#include <windows.h>
 
-using namespace std;
+uint64_t get_mantissa(double x) { uint64_t u; std::memcpy(&u, &x, 8); return u & ((1ULL << 52) - 1); }
+uint16_t get_exponent(double x) { uint64_t u; std::memcpy(&u, &x, 8); return (u >> 52) & 0x7FF; }
+uint8_t get_sign(double x) { uint64_t u; std::memcpy(&u, &x, 8); return (u >> 63) & 1; }
 
-int main()
-{
-    // ========================== INPUT ==========================
-    double x1 = 0.93827156398976e-38;
-    double x2 = 0.78782715676579e-38;
-    int Z = 1000000000;
+int main() {
+    SetThreadAffinityMask(GetCurrentThread(), 1);
+    SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS);
+    SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL);
 
-     std::cout << "  x1  = " << x1 << "\n";
-     std::cout << "  x2 = " << x2 << "\n";
-     std::cout << "  Z = " << Z << "\n";
-     std::cout << "  NPAt =  x1 + (x2 + x2 + ... + x2)"  << "\n";
+    // [INPUT DATA]
+    double x1_input = -3.45678998765432109e200;
+    double x2_input = 9.87654321234567852e200;
+    const int64_t Z = 1000000000LL;
+    const int RUNS = 9;
+    uint64_t results[RUNS];
+    double final_result_npat = 0;
 
-    // ========================== CONFIG ==========================
-    int Double_Float = 0;  // 0 = double (p=53), 1 = float (p=24)
-    int p = (Double_Float == 0) ? 53 : 24;
+    for (int run = 0; run < RUNS; run++) {
+        uint64_t mant1 = get_mantissa(x1_input);
+        uint16_t expo1 = get_exponent(x1_input);
+        int S1 = get_sign(x1_input) ? -1 : 1;
+        uint64_t mant2 = get_mantissa(x2_input);
+        uint16_t expo2 = get_exponent(x2_input);
+        int S2 = get_sign(x2_input) ? -1 : 1;
 
-    long long int K, K1, K2, X_max;
-    int e1, e2, E, v1, v2;
-    int S1 = 1, S2 = 1;
-    int g = 0, q = 0, bit0 = 0, bit1 = 0, t = 0;
-    unsigned i;
-    double buffer = 0.0;
-    double Y1_Double = 0.0, Y2_Double = 0.0, R_Double = 0.0;
-    float  Y1_Float = 0.0f, Y2_Float = 0.0f, R_Float = 0.0f;
+        int64_t K1, K2;
+        int E1, E2, E = 0;
+   
+        int g = 0, q = 0, b0 = 0, b1 = 0;
+        int64_t X_max = (1LL << 53);
+        int64_t i;
+        if (expo1 == 0) { K1 = (int64_t)mant1; E1 = -1022 - 52; }
+        else { K1 = (int64_t)(mant1 | (1ULL << 52)); E1 = (int)expo1 - 1023 - 52; }
+        if (expo2 == 0) { K2 = (int64_t)mant2; E2 = -1022 - 52; }
+        else { K2 = (int64_t)(mant2 | (1ULL << 52)); E2 = (int)expo2 - 1023 - 52; }
 
-    // ========================== INITIALIZATION ==========================
-    if (x1 < 0) S1 = -1;
-    if (x2 < 0) S2 = -1;
-
-    frexp(fabs(x1), &e1);
-    frexp(fabs(x2), &e2);
-
-    t = e1 - e2;
-
-    if (t < 0) {
-        t = -t;
-
-        buffer = x1; x1 = x2; x2 = buffer;
-        buffer = e1; e1 = e2; e2 = buffer;
-        buffer = S1; S1 = S2; S2 = buffer;
-    }
-
-    if (Double_Float == 0) {
-        Y1_Double = x1;
-        Y2_Double = x2;
-    }
-    else {
-        Y1_Float = static_cast<float>(x1);
-        Y2_Float = static_cast<float>(x2);
-    }
-
-    X_max = (1LL << p);
-    v1 = e1 - p;
-    v2 = e2 - p;
-
-    // ========================== CONVERT TO INTEGER MANTISSA ==========================
-    if (Double_Float == 1) 
-    {
-        K1 = llround(fabs(x1) * pow(2.0, -v1 + 1));
-        K2 = llround(fabs(x2) * pow(2.0, -v2 + 1));
-
-        bit0 = K1 & 1;
-        K1 >>= 1;
-        if (bit0) K1++;
-
-        bit0 = K2 & 1;
-        K2 >>= 1;
-        if (bit0) K2++;
-
-    }
-    else {
-        K1 = llround(fabs(x1) * pow(2.0, -v1));
-        K2 = llround(fabs(x2) * pow(2.0, -v2));
-    }
-
-    // ========================== EXPONENT ALIGNMENT ==========================
-    if (t != 0) 
-    {
-        K = K2;
-        K2 >>= (t - 1);
-        g = (K2 >> 0) & 1;
-        if (K2 << (t - 1) != K)
-            q = 1;   
-    bit0 = (K2 >> 0) & 1;
-        K2 >>= 1;
-    }
-
-    if (g == 1&&bit0==1) {
-        K2++;
-    }
-
-    E = v1;
-    K = K1;
-
-    // ========================== SUMMATION LOOP ==========================
-
-    for ( i = 2; i <= Z; ++i)
-    {
-      
-        K = S1 * K + S2 * K2;
-        S1 = 1;
-
-        if (K < 0) 
-        {
-            S1 = -1;
-            K = abs(K);
+        E = E1;
+        if (expo1 + expo2 != 0) {
+            int t = E1 - E2;
+            if (t < 0) {
+                E = E2; int64_t tempK = K1;
+                K1 >>= (std::abs(t) - 1);
+                g = (K1 >> 0) & 1;
+                if ((K1 << (std::abs(t) - 1)) != tempK) q = 1;
+                K1 >>= 1;
+            }
+            if (t > 0) {
+                E = E1; int64_t tempK = K2;
+                K2 >>= (t - 1);
+                g = (K2 >> 0) & 1;
+                if ((K2 << (t - 1)) != tempK) q = 1;
+                K2 >>= 1;
+            }
         }
 
-         bit0 = (K >> 0) & 1;
+        _mm_lfence();
+        uint64_t start = __rdtsc();
+        _mm_lfence();
 
-        if (abs(K) >= X_max)
-        {
-            E++;
-
-            bit1 = (K >> 1) & 1;
-            K = K >> 1;
-
-            if (bit0 == 1)
-            {
-                if (bit0 == 1 && bit1 == 0 && g == 0 && q == 0)
-                    goto  ResearchK2;
-
-                if (bit0 == 1 && bit1 == 1)
-                {
-                    K++;
-                    goto  ResearchK2;
-                }
-
-                K++;
+        for ( i = 2; i <= Z; ++i) {
+            K1 = S1 * K1 + S2 * K2; S1 = 1;
+            if (K1 < 0) { S1 = -1; K1 = std::abs(K1); }
+            if (K1 >= X_max) {
+                E++;
+                b0 = (K1 & 1); b1 = ((K1 >> 1) & 1);
+                K1 >>= 1;
+                if (b0 == 1 && !(b1 == 0 && g == 0 && q == 0)) K1++;
+                if (g == 1) q = 1;
+                g = (K2 & 1);
+                K2 >>= 1;
             }
-        ResearchK2:
-            bit0 = (K2 >> 0) & 1;
-            if (g == 1)
-                q = 1;
-            g = 0;
-            if (bit0 == 1)
-                g = 1;
-            K2 = K2 >> 1;
+            else {
+                if (S1 * S2 == 1) {
+                    if (g == 1 && ((K1 & 1) || q == 1))
+                        K1++;
+              
+                }
+                else {
+                    if (g == 1 && ((K1 & 1) || q == 1)) K1--;
+                }
+            }
         }
-        else
-        { 
-            if (g == 1)
-            {
-                if (bit0 == 1)
-                    K++;
-                  else
-                { 
-                    if (q == 1)
-                        K++;
-                }
-            }
-}
 
-            if (Double_Float == 0)
-            {
-                R_Double = S1 * (K * pow(2.0, E));
-            }
-            else
-            {
-                R_Float = S1 * (K * pow(2.0, E));
-                Y1_Float += Y2_Float;
-            }
-    
-             Y1_Double += Y2_Double;
+        _mm_lfence();
+        uint64_t end = __rdtsc();
+        _mm_lfence();
 
-  
-             if (i >=  Z-10 )
-        
-            {
-           std::cout << "  ------------------------------ " << "\n";
-                std::cout  << "  i  = " << i << "\n";
-               std::cout << setprecision(55) << "  NPAt     =  " << R_Double << "\n";
-              std::cout << setprecision(55) << "  Y_double  = " << Y1_Double << "\n";
-     
-            }
-
-
+        results[run] = end - start;
+        final_result_npat = S1 * (K1 * std::pow(2.0, E));
     }
+
+    std::sort(results, results + RUNS);
+
+    std::cout << "====================================================\n";
+    std::cout << " [NPAt PATHWAY 1 - ALU ENGINE (RESEARCH MODE)]\n";
+    std::cout << "----------------------------------------------------\n";
+    std::cout << "[INPUT DATA]\n";
+    std::cout << std::scientific << std::setprecision(17);
+    std::cout << "Initial Value (X1): " << x1_input << "\n";
+    std::cout << "Adder Value (X2):   " << x2_input << "\n";
+    std::cout << std::fixed << std::setprecision(0);
+    std::cout << "Total Iterations:   Z = " << Z << "\n";
+    std::cout << "Mode:               VOLATILE (Full Normalization)\n";
+    std::cout << "----------------------------------------------------\n";
+    std::cout << "NPAt (FINAL SUM):\n";
+    std::cout << std::scientific << std::setprecision(50) << final_result_npat << "\n";
+    std::cout << "----------------------------------------------------\n";
+    std::cout << "[PERFORMANCE]\n";
+    std::cout << std::fixed << std::setprecision(0);
+    std::cout << "TOTAL CPU CYCLES: " << results[0] << "\n";
+    std::cout << std::fixed << std::setprecision(4);
+    std::cout << "CYCLES PER ITER:  " << (double)results[0] / Z << "\n";
+    std::cout << "Med cycles/iter:  " << (double)results[RUNS / 2] / Z << "\n";
+    std::cout << "Spread:           " << 100.0 * (results[RUNS - 1] - results[0]) / results[0] << " %\n";
+    std::cout << "====================================================\n";
 
     return 0;
 }
