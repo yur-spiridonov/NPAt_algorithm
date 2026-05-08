@@ -221,17 +221,6 @@ Full results with screenshots: [Benchmark_Hardware-vs-NPAt-](https://github.com/
 
 ---
 
-## 👤 About the Author
 
-**Iouri Spiridonov** · Independent Researcher · Newmarket, ON, Canada
-
-- Former Head of Laboratory at NPO "Agat"
-- USSR State Prize Laureate · Medal for Labor Distinction
-- Holder of 18 Invention Certificates and 2 patents in digital architecture
-- Over 20 years of R&D in digital systems and numerical algorithms
-
-📧 spiridonoviouri@gmail.com
-
----
 
 *Released for research and evaluation. The NPAt format and associated algorithms are covered by U.S. Patent Pending (USPTO № 19/254,239). Commercial use requires a licensing agreement.*
