@@ -133,7 +133,7 @@ npat_demo_precision.exe
 
 ## Part 2 — Benchmark
 
-### Source: `npat_algorithm.cpp`
+### Source: `npat_benchmark.cpp`
 
 This program measures the performance of NPAt-algorithm against the hardware IEEE 754 baseline.
 
@@ -186,8 +186,8 @@ Run the hardware baseline from [Benchmark_Hardware-vs-NPAt-](https://github.com/
 ### Building
 
 ```bash
-cl /O2 /fp:precise /EHsc npat_algorithm.cpp /Fe:npat_algorithm.exe
-npat_algorithm.exe
+cl /O2 /fp:precise /EHsc npat_benchmark.cpp /Fe:npat_benchmark.exe
+npat_benchmark.exe
 ```
 
 > **Note:** Results are hardware- and compiler-specific. Reference results above were obtained on a specific x86-64 machine with MSVC /O2, Windows 11, Core 0, REALTIME_PRIORITY_CLASS.
