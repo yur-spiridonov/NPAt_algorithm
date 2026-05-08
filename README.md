@@ -63,7 +63,7 @@ The **same algorithm** runs identically for any value of t from 4 to 53 — with
 
 ## Part 1 — Precision Demo
 
-### Source: `npat_demo_precision.cpp`
+### Source: [npat_demo_precision.cpp](npat_demo_precision.cpp)
 
 This program demonstrates a key property of NPAt: **the same algorithm runs at any precision from t=4 to t=53 without modification**.
 
@@ -133,7 +133,7 @@ npat_demo_precision.exe
 
 ## Part 2 — Benchmark
 
-### Source: `npat_benchmark.cpp`
+### Source: [npat_benchmark.cpp](npat_benchmark.cpp)
 
 This program measures the performance of NPAt-algorithm against the hardware IEEE 754 baseline.
 
