@@ -61,6 +61,19 @@ The **same algorithm** runs identically for any value of t from 4 to 53 — with
 
 ---
 
+## 🔧 How to Build and Run
+
+1. Install [Visual Studio](https://visualstudio.microsoft.com/) with the **Desktop development with C++** workload
+2. Open Visual Studio and select **File → New → Project**
+3. Choose **Console App (C++)**, click **Next**, enter a project name, click **Create**
+4. Replace all template code in the generated `.cpp` file with the contents of the selected source file (`npat_demo_precision.cpp` or `npat_benchmark.cpp`)
+5. In the toolbar, set configuration to **Release** and platform to **x64**
+6. Press **Ctrl+F5** to build and run without debugger
+
+> ⚠️ Requires Windows and MSVC compiler. The benchmark uses `<intrin.h>` and `<windows.h>` — GCC/Clang are not supported.
+
+---
+
 ## Part 1 — Precision Demo
 
 ### Source: [npat_demo_precision.cpp](npat_demo_precision.cpp)
@@ -122,7 +135,7 @@ Use any scientific calculator (Windows Calc in Scientific mode, or WolframAlpha)
 - Each additional ~5 bits of t yields approximately 1–2 more correct decimal digits
 - At t=8 the algorithm still runs correctly — it simply operates at 8-bit precision
 
-### Building
+### Building via command line
 
 ```bash
 cl /O2 /EHsc npat_demo_precision.cpp /Fe:npat_demo_precision.exe
@@ -183,7 +196,7 @@ Run the hardware baseline from [Benchmark_Hardware-vs-NPAt-](https://github.com/
 -3.45678998765432109e200 + 999999999 * 9.87654321234567852e200
 ```
 
-### Building
+### Building via command line
 
 ```bash
 cl /O2 /fp:precise /EHsc npat_benchmark.cpp /Fe:npat_benchmark.exe
@@ -218,9 +231,8 @@ Full results with screenshots: [Benchmark_Hardware-vs-NPAt-](https://github.com/
 |---|---|
 | [NPAt-Core-Research](https://github.com/yur-spiridonov/NPAt-Core-Research) | Full theoretical foundation of NPAt format |
 | [Benchmark_Hardware-vs-NPAt-](https://github.com/yur-spiridonov/Benchmark_Hardware-vs-NPAt-) | Hardware IEEE 754 baseline — full results with screenshots |
+| [PresentationNPat](https://github.com/yur-spiridonov/PresentationNPat) | Precision comparison results: NPAt vs IEEE 754 across multiple input types |
 
 ---
-
-
 
 *Released for research and evaluation. The NPAt format and associated algorithms are covered by U.S. Patent Pending (USPTO № 19/254,239). Commercial use requires a licensing agreement.*
