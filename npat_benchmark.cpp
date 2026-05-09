@@ -101,7 +101,7 @@ int main() {
     std::sort(results, results + RUNS);
 
     std::cout << "====================================================\n";
-    std::cout << " [NPAt PATHWAY 1 - ALU ENGINE (RESEARCH MODE)]\n";
+    std::cout << " [NPAt algorithm - ALU ENGINE (RESEARCH MODE)]\n";
     std::cout << "----------------------------------------------------\n";
     std::cout << "[INPUT DATA]\n";
     std::cout << std::scientific << std::setprecision(17);
